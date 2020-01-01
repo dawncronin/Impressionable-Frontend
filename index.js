@@ -79,9 +79,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const celebBox = document.getElementsByClassName("box")
     const impressionAudio = document.getElementById("newSong")
     const button1 = document.getElementById("button")
-    button1.addEventListener("click", () =>{
-            audio.play()
-          })
     impressionAudio.addEventListener("submit", (event) =>{
             event.preventDefault()
             postImpression(event)
@@ -100,19 +97,23 @@ document.addEventListener("DOMContentLoaded", ()=>{
        `<h3>${apiData.data[i].attributes.name}</h3>
         <p>${apiData.data[i].attributes.description}</p>
         <p>${apiData.data[i].attributes.audio_text}</p>
+        
         <button id="button"> Listen</button> >>>> <button id="button2">Record</button>`
         newDiv.innerHTML = newValue
         innerBox[i].appendChild(newDiv)
     }
+        // <audio controls> <source src="samples/happyhungergames2.mp3
+        // <audio src="samples/happyhungergames2.mp3" loop>,
+        // " type="audio/mpeg"> ${apiData.data[i].attributes.audio}</audio>
 
-    const picBox = Array.from(document.getElementsByClassName("box"))
-    for(let i = 0; i< picBox.length; i++){
-        let newDiv = document.createElement('div')
-        let newValue = 
-       `<a href="" class="celebImage"><img src="https://target.scene7.com/is/image/Target/GUEST_10348e87-6152-4bd0-b1fe-d96ea230800c?wid=488&hei=488&fmt=pjpeg" alt=""/></a>`
-        newDiv.innerHTML = newValue
-        innerBox[i].prepend(newDiv) 
-    }
+    // const picBox = Array.from(document.getElementsByClassName("box"))
+    // for(let i = 0; i< picBox.length; i++){
+    //     let newDiv = document.createElement('div')
+    //     let newValue = 
+    //    `<a href="" class="celebImage"><img src="https://target.scene7.com/is/image/Target/GUEST_10348e87-6152-4bd0-b1fe-d96ea230800c?wid=488&hei=488&fmt=pjpeg" alt=""/></a>`
+    //     newDiv.innerHTML = newValue
+    //     innerBox[i].prepend(newDiv) 
+    // }
 
   
     // apiData.data.forEach( el =>{
@@ -141,11 +142,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
  // *******************************************************
 async function postImpression(event) {
     const audioFile = event.target.querySelector("#audio_file").files[0]
-const formData = new FormData(
-formData.append('impression[user_id]', 1),
-formData.append('impression[celebrity_id]', 1),
-formData.append('impression[match_score]', 5),
-formData.append('impression[audio]', audioFile))
+    const formData = new FormData(
+    formData.append('impression[user_id]', 1),
+    formData.append('impression[celebrity_id]', 1),
+    formData.append('impression[match_score]', 5),
+    formData.append('impression[audio]', audioFile))
 
 
   const response = await fetch(impressionsURL, {
@@ -164,5 +165,9 @@ formData.append('impression[audio]', audioFile))
           const audioBlob = new Blob([audioSample],{type: 'audio/mp3'});
           const audioUrl = URL.createObjectURL(audioBlob);
           const audio = new Audio(audioUrl);
-          audio.play()
+          //   audio.play()
+          const listenButton = document.querySelector("#button")
+          listenButton.addEventListener("click",() => {
+              audio.play()
+          })
 }
