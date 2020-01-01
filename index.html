@@ -8,83 +8,32 @@
     <script src="index.js"></script>
   </head>
   <body>
-    <header>
-      <h2>Welcome to Impressionable!</h2>
-      <header>
-        <h1>Impressionable</h1>
-        <p>The Ultimate Celebrity Impression site you'll ever be on!</p>
-        <form id="newSong" method="post" action="post">
-          <div class="field">
-              <label for="name">Impression Name:</label>
-              <input type="text" id="name" name="name" required>
-          </div>
-        
-          <div class="field">
-              <label for="audio">Audio Clip:</label>
-              <input id="audio_file" type = "file" name="impression_audio" accept="audio/*" required></input>
-          </div>
-        
-          <div class="field">
-              <input type="submit"></input>
-          </div>
+    <div class="main">
+      <div id="login">
+        <form id="loginForm">
+          <label>Please Enter Your Username To Get Started:</label> 
+          <input type="text" name="username" placeholder="username">
+          <input type="submit">
         </form>
-        <!-- <audio src="samples/happyhungergames2.mp3" AutoPlay loop> -->
-            <!-- <source src="https://uc008248b8f5948f11285557bc23.previews.dropboxusercontent.com/p/hls_master_playlist/AAro7BmK9a-KxURBjMIeMdpBBfFKd6-N6Ns3VZFRYb0xb5VYuCBOV1bzzfRQWQPpcUH7VFskYZEcrHH-GTNGht8BCmdRofvmG3gsZh7IJqhmSfdNlzdBIVWRtW_mlw-tz2c0A4cOmuWXbNKQK_jBokgc0wn2OsQASAEHjZTfzcdrctrJnxFtO-rYm-ZSqVhaGTW5sbE6my5muKL2CkICM2gYj3ngqFt8D9THbJe4zkzu0BDTL48n9Dg4nhK_EJKMRQf0GhrlrmBb59qS0uriak2pDyX5pqYIpRUWlX3osqzUZQJkB2D9BDR2mdkkwSjlQTV_bj0UdQYxt3DDleZLUBFBomy_PqbsXv9m_TP8UM0RkHQCF9cMSgfdNBGTazmy_Wk/p.m3u8">  -->
-            </audio>
-      </header>
-    </div>
-  </section>
-
-  <div id="main">
-    <div class="inner">
-      <div class="thumbnails">
-
-        <div class="box">
-            <a href="" class="celebImage"><img src="pics/hungergames.jpg" alt="" width ="75" height="auto"/></a>
-          <div class="innerBox">
-      
-          </div>
-        </div>
-
-        <div class="box">
-            <a href="" class="celebImage"><img src="pics/petergriffen.jpg" alt="" width ="75" height="auto"/></a>
-          <div class="innerBox">
-            
-          </div>
-        </div>
-
-        <div class="box">
-            <a href="" class="celebImage"><img src="pics/scarface.jpg" alt="" width ="75" height="auto"/></a>
-          <div class="innerBox">
-           
-          </div>
-        </div>
-
-        <div class="box">
-          
-          <div class="innerBox">
-
-          </div>
-        </div>
-
-        <div class="box">
-          
-          <div class="innerBox">
-         
-          </div>
-        </div>
-
-        <div class="box">
-          
-          <div class="innerBox">
-            
-          </div>
-        </div>
 
       </div>
 
+      <div id="afterLogin">
+
+        <div id="celebContainer">
+
+        </div>
     </div>
   </div>
+
+<div class="sidenav">
+  <h2>Welcome to Impressionable!</h2>
+  <h4>The Ultimate Celebrity Impression site you'll ever be on!</h4>
+  <p id="chooseCeleb"> Choose a Celebrity:</p>
+  <div id="celebrityNames">
+
+  </div>
+</div>
 
 </body>
 </html>

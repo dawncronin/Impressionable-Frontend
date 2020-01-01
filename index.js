@@ -6,51 +6,103 @@ const usersURL = "http://localhost:3000/users"
 
 document.addEventListener("DOMContentLoaded", ()=>{
     fetchCelebrities()
-    fetchCelebrity()
-    fetchImpressions()
-    fetchUsers()
-    const impressionBox = document.querySelector("body > main")
-    const celebBox = document.getElementsByClassName("box")
-    const impressionAudio = document.getElementById("newSong")
-    const button1 = document.getElementById("button")
-    impressionAudio.addEventListener("submit", (event) =>{
-            event.preventDefault()
-            postImpression(event)
-          })
+    let currentUser = waitForLogin()
+    // fetchImpressions()
+    // fetchUsers()
+    // const impressionBox = document.querySelector("body > main")
+    // const celebBox = document.getElementsByClassName("box")
+    // const impressionAudio = document.getElementById("newSong")
+    // const button1 = document.getElementById("button")
+    // impressionAudio.addEventListener("submit", (event) =>{
+    //         event.preventDefault()
+    //         postImpression(event)
+    //       })
 })
 
-  // async function fetchCelebrity(){
-  //   const response = await fetch("http://localhost:3000/celebrities/1/audio")
-  //   const apiData = await response.json();
-  //   console.log(apiData.link)
-  //   var audio = new Audio(apiData.link);
-  //   // audio.src = apiData.link
-  //   document.addEventListener("click", (event) => audio.play())
-    // document.querySelector("body").innerHTML = `
-    //   <div id="player">
-    //   <audio src="${apiData.link}" controls></audio>
-    //   <div id="mask"></div>
-    //   </div>"
-    // `
+async function waitForLogin() {
+    let res = await fetch(usersURL)
+    let users = await res.json()
+    users = users.data
 
-    // var blob = new Blob([response], { type: 'audio/mp3' });
-    // var url = window.URL.createObjectURL(blob)
-    // window.audio = new Audio();
-    // window.audio.src = url;
-    // console.log(url)
+    document.querySelector("#loginForm").addEventListener("submit", (event) => {
+    event.preventDefault()
+    let value = event.target.username.value
+    let exsistingUser = users.find(user => user.attributes.username == value)
+    if (exsistingUser == undefined) {
+        fetch(usersURL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accpet':'application/json'},
+              body: JSON.stringify({username: value})})
+      .then(res => res.json())
+      .then(json => {
+        return await json})
+    //post request to new user here
+    //return new user
+    }
+    else {
+      return exsistingUser
+    }
+  })
 
+}
 
-  }
   async function fetchCelebrities(){
     const response = await fetch(celebritiesURL)
     const apiData = await response.json();
-    // console.log("Here are the Celebs")
-    // console.log(apiData)
-    var blob = new Blob([apiData.data[0].audio], { type: 'audio/mp3' });
-    var url = window.URL.createObjectURL(blob)
-    window.audio = new Audio();
-    window.audio.src = url;
-    console.log(url)
+    console.log(apiData)
+    apiData.data.forEach(celeb => {
+      let celebName = document.createElement("div")
+      celebName.setAttribute("id", celeb.attributes.name.split("")[0])
+      celebName.innerHTML = `
+      <p> ${celeb.attributes.name} </p>
+      `
+      document.querySelector("#chooseCeleb").appendChild(celebName)
+      // celebName.addEventListener("Click", (event) => displayCeleb(event))
+
+      addCelebrity(celeb)
+    })
+  }
+      
+
+  async function addCelebrity(celeb) {
+    let newCeleb = document.createElement("div")
+      newCeleb.setAttribute("id", celeb.attributes.id)
+      newCeleb.setAttribute("class", "box")
+      newCeleb.innerHTML = `
+      <h3> ${celeb.attributes.name} </h3>
+      <img src=${celeb.attributes.image} width=100>
+      <p>${celeb.attributes.description}</p>
+      <p>"${celeb.attributes.audio_text}"</p>
+      <audio controls>
+      <source src="http://localhost:3000/${celeb.attributes.audio_url}" type="audio/mpeg">
+        Your browser does not support the <code>audio</code> element. 
+      </audio>
+      `
+      document.querySelector("#celebContainer").appendChild(newCeleb)
+      
+      newImpression = document.createElement("form")
+      newImpression.setAttribute("id", `newImpression${celeb.attributes.id}`)  
+      newImpression.innerHTML = `
+      <p> Add your impression below: </p>
+      <input type="file" accept="audio/*" capture>
+      `
+
+      newCeleb.appendChild(newImpression)
+      // newImpression.addEventListener("change", (event) => postImpression(event))
+  }
+
+
+
+
+
+  
+
+    // var audio = new Audio(`http://localhost:3000/${apiData.data[0].attributes.audio_url}`)
+    // document.addEventListener("click", (event) => audio.play())
+
+    
 
     // const innerBox= Array.from(document.getElementsByClassName("innerBox"))
     // for(let i = 0; i< innerBox.length; i++){
@@ -86,7 +138,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     
     //     console.log(innerBox)
     // }
-}
+
 //   // *******************************************************
 //   async function fetchImpressions(){
 //     const response = await fetch(impressionsURL)
@@ -95,12 +147,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 //     console.log(apiData)
 //   }
 //  // *******************************************************
-//   async function fetchUsers(){
-//     const response = await fetch(usersURL)
-//     const apiData = await response.json();
-//     console.log("Here are the Users")
-//     console.log(apiData)
-//   }
+
 //  // *******************************************************
 // async function postImpression(event) {
 //     const audioFile = event.target.querySelector("#audio_file").files[0]
@@ -132,4 +179,4 @@ document.addEventListener("DOMContentLoaded", ()=>{
 //           listenButton.addEventListener("click",() => {
 //               audio.play()
 //           })
-// }
+// 
