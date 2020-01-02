@@ -12,7 +12,7 @@
   }
   .main {
 	margin-left: 300px; /* Same as the width of the sidebar */
-	padding: 30px 5px 5px 5px;
+	padding: 10px 5px 5px 5px;
   }
 
   #login{
@@ -34,6 +34,21 @@
 
 #logout, #chooseCeleb{
 	display: none
+}
+
+.celebName:hover {
+	color: rgba(42, 126, 126, 0.75);
+	background: #262627;
+
+}
+
+button{
+    height:20px; 
+    width:100px; 
+    margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    left:50%;
 }
 
 

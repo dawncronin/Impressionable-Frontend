@@ -25,7 +25,7 @@ function waitForLogin(users) {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Accpet':'application/json'},
+                'Accept':'application/json'},
               body: JSON.stringify({username: value})})
       .then(res => res.json())
       .then(currentUser => {
@@ -66,38 +66,44 @@ function logoutEvent(event) {
 }
 
 function fetchCelebrities(){
+  document.querySelector("#celebrityNames").innerHTML = ""
     fetch(celebritiesURL)
     .then(res => res.json())
     .then(function(json) {
       json.data.forEach(celeb => {
-        document.querySelector("#chooseCeleb")
         let celebName = document.createElement("div")
-        celebName.setAttribute("class", `celeb-celeb.attributes.id`)
+        celebName.setAttribute("class", `celebName`)
         celebName.innerHTML = `
         <p> ${celeb.attributes.name} </p>
         `
         addCelebrity(celeb)
-        document.querySelector("#chooseCeleb").appendChild(celebName)
-        celebName.addEventListener("click", (event) => displayCeleb(event))
+        document.querySelector("#celebrityNames").appendChild(celebName)
+        celebName.addEventListener("click", (event) => displayCeleb(event, celeb))
   
       })
     })
 }
-function displayCeleb(event){
-  celebId = event.target.class
-  celeb = document.querySelector(`#celeb-${celebId}`)
-  // celeb.style.display = "block"
+function displayCeleb(event, celeb){
+  let celebElement = document.querySelector(`#box-${celeb.id}`)
+  let celebContainer = document.querySelector("#celebContainer")
+  let children = celebContainer.children
+  console.log(children)
+  for(let i = 0; i < children.length; i++){
+    
+    children[i].style.display = "none"}
+
+  celebElement.style.display = "block"
 }
 
 function addCelebrity(celeb) {
     let newCeleb = document.createElement("div")
     let impressions = celeb.relationships.impressions
-      newCeleb.setAttribute("id", celeb.id)
+      newCeleb.setAttribute("id", `box-${celeb.id}`)
       newCeleb.setAttribute("class", "box")
-      // newCeleb.style.display = "none"
+      newCeleb.style.display = "none"
       newCeleb.innerHTML = `
       <h3> ${celeb.attributes.name} </h3>
-      <img src=${celeb.attributes.image} width=100>
+      <img src=${celeb.attributes.image} width=300>
       <p>${celeb.attributes.description}</p>
       <p>"${celeb.attributes.audio_text}"</p>
       <audio controls>
@@ -113,21 +119,21 @@ function addCelebrity(celeb) {
       <p> Add your impression below: </p>
       <input type="file" id="input-${celeb.id}" accept="audio/*" capture>
 
-      <h3> Here Other's Impressions! </H3>
+      <h3> The Impressions: </H3>
       `
           
       newCeleb.appendChild(newImpression)
-      document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb))
+      document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb, newCeleb))
       addImpressions(impressions, newCeleb)
   }
 
-  function addImpressions(impressions, newCeleb) {
+function addImpressions(impressions, newCeleb) {
     impressions.data.forEach(imp => {
       fetch(`${impressionsURL}/${imp.id}/audio`)
       .then(res => res.json())
       .then(function(json) {
         let newImpression = document.createElement("div")
-        newImpression.setAttribute("id", imp.id)
+        newImpression.setAttribute("id", `imp-${imp.id}`)
         newImpression.innerHTML = `
         <p> ${json.username}'s Impression: </p>
         <audio controls>
@@ -136,110 +142,43 @@ function addCelebrity(celeb) {
         </audio>
 
         `
+
         newCeleb.appendChild(newImpression)
       })
     })
   }
-  //2020
 
-  function postImpression(event, celeb) {
-    console.log(event.value)
-    console.log(document.querySelector(`newImpression-${celeb.id}`))
+  function postImpression(celeb, newCeleb) {
+    let loggedIn = document.querySelector("#loggedIn")
+    let user = (loggedIn.className).split("-")[1]
+    let file = document.querySelector(`#input-${celeb.id}`).files[0]
+    const formData = new FormData()
+          formData.append('impression[user_id]', user),
+          formData.append('impression[celebrity_id]', celeb.id),
+          formData.append('impression[audio_impression]', file)
+      
+        fetch(impressionsURL, {
+          method: 'POST',
+          body: formData })
+      .then(res => res.json())
+      .then(json => {
+        renderNewImpression(json, celeb, newCeleb)
+        document.querySelector(`#input-${celeb.id}`).files[0] = null})
   }
-    // const formData = new FormData()
-    //       formData.append('impression[user_id]', 1),
-    //       formData.append('impression[celebrity_id]', 1),
-    //       formData.append('impression[audio_impression]', event.file)
-      
-      
-  //       fetch(impressionsURL, {
-  //           method: 'POST',
-  //           body: formData
-  //       })
-  //       .then(res => res.json())
-  //       .then(json => console.log(json))
-  
-  // }
 
-
-    // var audio = new Audio(`http://localhost:3000/${apiData.data[0].attributes.audio_url}`)
-    // document.addEventListener("click", (event) => audio.play())
-
+  function renderNewImpression(json, celeb, newCeleb) {
     
+    let newImpression = document.createElement("div")
+    newImpression.setAttribute("id", `imp-${json.id}`)
+    newImpression.innerHTML = `
+    <p> ${json.username}'s Impression: </p>
+    <audio controls>
+    <source src="${json.link}" type="audio/mpeg">
+      Your browser does not support the <code>audio</code> element. 
+    </audio>
+    `
+    newCeleb.appendChild(newImpression)
 
-    // const innerBox= Array.from(document.getElementsByClassName("innerBox"))
-    // for(let i = 0; i< innerBox.length; i++){
-    //     let newDiv = document.createElement('div')
-    //     let newValue = 
-    //    `<h3>${apiData.data[i].attributes.name}</h3>
-    //     <p>${apiData.data[i].attributes.description}</p>
-    //     <p>${apiData.data[i].attributes.audio_text}</p>
+  }
         
-    //     <button id="button"> Listen</button> >>>> <button id="button2">Record</button>`
-    //     newDiv.innerHTML = newValue
-    //     innerBox[i].appendChild(newDiv)
-    // }
-        // <audio controls> <source src="samples/happyhungergames2.mp3
-        // <audio src="samples/happyhungergames2.mp3" loop>,
-        // " type="audio/mpeg"> ${apiData.data[i].attributes.audio}</audio>
-
-    // const picBox = Array.from(document.getElementsByClassName("box"))
-    // for(let i = 0; i< picBox.length; i++){
-    //     let newDiv = document.createElement('div')
-    //     let newValue = 
-    //    `<a href="" class="celebImage"><img src="https://target.scene7.com/is/image/Target/GUEST_10348e87-6152-4bd0-b1fe-d96ea230800c?wid=488&hei=488&fmt=pjpeg" alt=""/></a>`
-    //     newDiv.innerHTML = newValue
-    //     innerBox[i].prepend(newDiv) 
-    // }
-
   
-    // apiData.data.forEach( el =>{
-    //     innerBox.innerText +=
-    //    `<h3>${el.attributes.name}</h3>
-    //     <p>${el.attributes.description}</p>
-    //     <p>${el.attributes.audio_text}</p>`
-    
-    //     console.log(innerBox)
-    // }
-
-//   // *******************************************************
-//   async function fetchImpressions(){
-//     const response = await fetch(impressionsURL)
-//     const apiData = await response.json();
-//     console.log("Here are the Impressions")
-//     console.log(apiData)
-//   }
-//  // *******************************************************
-
-//  // *******************************************************
-// async function postImpression(event) {
-//     const audioFile = event.target.querySelector("#audio_file").files[0]
-//     const formData = new FormData(
-//     formData.append('impression[user_id]', 1),
-//     formData.append('impression[celebrity_id]', 1),
-//     formData.append('impression[match_score]', 5),
-//     formData.append('impression[audio]', audioFile))
-
-
-//   const response = await fetch(impressionsURL, {
-//       method: 'POST',
-//       body: formData
-//   })
-//   const apiData = await response.json();
-//   debugger
-
-// //   let newAudio = document.createElement("audio"); 
-// //   newAudio.src = '';
-// //   document.append(newAudio);
-// //   audioFile.play()
-
-//           const audioSample = audioFile
-//           const audioBlob = new Blob([audioSample],{type: 'audio/mp3'});
-//           const audioUrl = URL.createObjectURL(audioBlob);
-//           const audio = new Audio(audioUrl);
-//           //   audio.play()
-//           const listenButton = document.querySelector("#button")
-//           listenButton.addEventListener("click",() => {
-//               audio.play()
-//           })
-// 
