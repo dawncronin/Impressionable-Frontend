@@ -140,6 +140,7 @@ function addCelebrity(celeb) {
       })
     })
   }
+  //2020
 
   function postImpression(event, celeb) {
     console.log(event.value)
