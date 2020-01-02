@@ -72,7 +72,7 @@ function fetchCelebrities(){
       json.data.forEach(celeb => {
         document.querySelector("#chooseCeleb")
         let celebName = document.createElement("div")
-        celebName.setAttribute("class", celeb.attributes.id)
+        celebName.setAttribute("class", `celeb-celeb.attributes.id`)
         celebName.innerHTML = `
         <p> ${celeb.attributes.name} </p>
         `
@@ -85,17 +85,16 @@ function fetchCelebrities(){
 }
 function displayCeleb(event){
   celebId = event.target.class
-  celeb = document.querySelector(`#${celebId}`)
-  celeb.style.display = "block"
-
+  celeb = document.querySelector(`#celeb-${celebId}`)
+  // celeb.style.display = "block"
 }
+
 function addCelebrity(celeb) {
     let newCeleb = document.createElement("div")
     let impressions = celeb.relationships.impressions
-      newCeleb.setAttribute("id", celeb.attributes.id)
+      newCeleb.setAttribute("id", celeb.id)
       newCeleb.setAttribute("class", "box")
-      newCeleb.style.display = "none"
-      console.log(celeb)
+      // newCeleb.style.display = "none"
       newCeleb.innerHTML = `
       <h3> ${celeb.attributes.name} </h3>
       <img src=${celeb.attributes.image} width=100>
@@ -109,34 +108,58 @@ function addCelebrity(celeb) {
       document.querySelector("#celebContainer").appendChild(newCeleb)
       
       newImpression = document.createElement("form")
-      newImpression.setAttribute("id", `newImpression${celeb.attributes.id}`)  
+      newImpression.setAttribute("id", `newImpression-${celeb.id}`)  
       newImpression.innerHTML = `
       <p> Add your impression below: </p>
-      <input type="file" accept="audio/*" capture>
+      <input type="file" id="input-${celeb.id}" accept="audio/*" capture>
+
+      <h3> Here Other's Impressions! </H3>
       `
           
       newCeleb.appendChild(newImpression)
-      // newImpression.addEventListener("change", (event) => postImpression(event))
-      addImpressions(impressions)
+      document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb))
+      addImpressions(impressions, newCeleb)
   }
 
-  function addImpressions(impressions) {
+  function addImpressions(impressions, newCeleb) {
     impressions.data.forEach(imp => {
       fetch(`${impressionsURL}/${imp.id}/audio`)
       .then(res => res.json())
-      .then(json => function(json) {
+      .then(function(json) {
         let newImpression = document.createElement("div")
+        newImpression.setAttribute("id", imp.id)
+        newImpression.innerHTML = `
+        <p> ${json.username}'s Impression: </p>
+        <audio controls>
+        <source src="${json.link}" type="audio/mpeg">
+          Your browser does not support the <code>audio</code> element. 
+        </audio>
+
+        `
+        newCeleb.appendChild(newImpression)
       })
     })
   }
 
-
-
-
-
-
-
+  function postImpression(event, celeb) {
+    console.log(event.value)
+    console.log(document.querySelector(`newImpression-${celeb.id}`))
+  }
+    // const formData = new FormData()
+    //       formData.append('impression[user_id]', 1),
+    //       formData.append('impression[celebrity_id]', 1),
+    //       formData.append('impression[audio_impression]', event.file)
+      
+      
+  //       fetch(impressionsURL, {
+  //           method: 'POST',
+  //           body: formData
+  //       })
+  //       .then(res => res.json())
+  //       .then(json => console.log(json))
   
+  // }
+
 
     // var audio = new Audio(`http://localhost:3000/${apiData.data[0].attributes.audio_url}`)
     // document.addEventListener("click", (event) => audio.play())
