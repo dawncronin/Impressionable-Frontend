@@ -1,75 +1,101 @@
-
-
 const impressionsURL = "http://localhost:3000/impressions"
 const celebritiesURL = "http://localhost:3000/celebrities"
 const usersURL = "http://localhost:3000/users"
 
-document.addEventListener("DOMContentLoaded", ()=>{
-    fetchCelebrities()
-    let currentUser = waitForLogin()
-    // fetchImpressions()
-    // fetchUsers()
-    // const impressionBox = document.querySelector("body > main")
-    // const celebBox = document.getElementsByClassName("box")
-    // const impressionAudio = document.getElementById("newSong")
-    // const button1 = document.getElementById("button")
-    // impressionAudio.addEventListener("submit", (event) =>{
-    //         event.preventDefault()
-    //         postImpression(event)
-    //       })
+document.addEventListener("DOMContentLoaded", (event) => {
+  fetchUsers()
+
 })
 
-async function waitForLogin() {
-    let res = await fetch(usersURL)
-    let users = await res.json()
-    users = users.data
+function fetchUsers() {
+  fetch(usersURL)
+  .then(res => res.json())
+  .then(json => {
+    waitForLogin(json.data)
+  })
+}
 
+function waitForLogin(users) {
     document.querySelector("#loginForm").addEventListener("submit", (event) => {
     event.preventDefault()
     let value = event.target.username.value
-    let exsistingUser = users.find(user => user.attributes.username == value)
-    if (exsistingUser == undefined) {
-        fetch(usersURL, {
+    let currentUser = users.find(user => user.attributes.username == value)
+    if (currentUser == undefined) {
+            fetch(usersURL, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Accpet':'application/json'},
               body: JSON.stringify({username: value})})
       .then(res => res.json())
-      .then(json => {
-        return await json})
-    //post request to new user here
-    //return new user
+      .then(currentUser => {
+        fetchCelebrities(currentUser.data)
+        renderCurrentUser(currentUser.data)
+        event.target.username.value = ""
+      })
     }
     else {
-      return exsistingUser
+      fetchCelebrities(currentUser)
+      renderCurrentUser(currentUser)
+      event.target.username.value = ""
     }
   })
 
 }
+function renderCurrentUser(currentUser) {
+  let loggedIn = document.querySelector("#loggedIn")
+  let logout = document.querySelector("#logout")
+  document.querySelector("#login").style.display = "none"
+  document.querySelector("#chooseCeleb").style.display = "block"
+  document.querySelector("#afterLogin").style.display = "block"
+  document.querySelector("#celebrityNames").style.display = "block"
+  loggedIn.innerText = `Logged in as ${currentUser.attributes.username}`
+  loggedIn.setAttribute("class", `user-${currentUser.id}`)
+  logout.style.display = "block"
+  logout.addEventListener("click", event => logoutEvent(event))
+}
 
-  async function fetchCelebrities(){
-    const response = await fetch(celebritiesURL)
-    const apiData = await response.json();
-    console.log(apiData)
-    apiData.data.forEach(celeb => {
-      let celebName = document.createElement("div")
-      celebName.setAttribute("id", celeb.attributes.name.split("")[0])
-      celebName.innerHTML = `
-      <p> ${celeb.attributes.name} </p>
-      `
-      document.querySelector("#chooseCeleb").appendChild(celebName)
-      // celebName.addEventListener("Click", (event) => displayCeleb(event))
+function logoutEvent(event) {
+  let loggedIn = document.querySelector("#loggedIn")
+  loggedIn.innerText = `Please Login!`
+  document.querySelector("#login").style.display = "block"
+  document.querySelector("#chooseCeleb").style.display = "none"
+  document.querySelector("#celebrityNames").style.display = "none"
+  document.querySelector("#afterLogin").style.display = "none"
+  event.target.style.display = "none"
+}
 
-      addCelebrity(celeb)
+function fetchCelebrities(){
+    fetch(celebritiesURL)
+    .then(res => res.json())
+    .then(function(json) {
+      json.data.forEach(celeb => {
+        document.querySelector("#chooseCeleb")
+        let celebName = document.createElement("div")
+        celebName.setAttribute("class", celeb.attributes.id)
+        celebName.innerHTML = `
+        <p> ${celeb.attributes.name} </p>
+        `
+        addCelebrity(celeb)
+        document.querySelector("#chooseCeleb").appendChild(celebName)
+        celebName.addEventListener("click", (event) => displayCeleb(event))
+  
+      })
     })
-  }
-      
+}
+function displayCeleb(event){
+  celebId = event.target.class
+  celeb = document.querySelector(`#${celebId}`)
+  celeb.style.display = "block"
 
-  async function addCelebrity(celeb) {
+}
+function addCelebrity(celeb) {
     let newCeleb = document.createElement("div")
+    let impressions = celeb.relationships.impressions
       newCeleb.setAttribute("id", celeb.attributes.id)
       newCeleb.setAttribute("class", "box")
+      newCeleb.style.display = "none"
+      console.log(celeb)
       newCeleb.innerHTML = `
       <h3> ${celeb.attributes.name} </h3>
       <img src=${celeb.attributes.image} width=100>
@@ -88,10 +114,23 @@ async function waitForLogin() {
       <p> Add your impression below: </p>
       <input type="file" accept="audio/*" capture>
       `
-
+          
       newCeleb.appendChild(newImpression)
       // newImpression.addEventListener("change", (event) => postImpression(event))
+      addImpressions(impressions)
   }
+
+  function addImpressions(impressions) {
+    impressions.data.forEach(imp => {
+      fetch(`${impressionsURL}/${imp.id}/audio`)
+      .then(res => res.json())
+      .then(json => function(json) {
+        let newImpression = document.createElement("div")
+      })
+    })
+  }
+
+
 
 
 
