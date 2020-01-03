@@ -59,7 +59,6 @@ const recordStop = async (event, celeb, newCeleb) => {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   fetchUsers()
-
 })
 
 function fetchUsers() {
@@ -132,6 +131,7 @@ function logoutEvent(event) {
 }
 
 function fetchCelebrities(){
+  document.querySelector("#celebContainer").innerHTML = ""
   document.querySelector("#celebrityNames").innerHTML = ""
     fetch(celebritiesURL)
     .then(res => res.json())
@@ -140,7 +140,7 @@ function fetchCelebrities(){
         let celebName = document.createElement("div")
         celebName.setAttribute("class", `celebName`)
         celebName.innerHTML = `
-        <p> ${celeb.attributes.name} </p>
+        <h3> ${celeb.attributes.name} </h3> 
         `
         addCelebrity(celeb)
         document.querySelector("#celebrityNames").appendChild(celebName)
@@ -203,8 +203,9 @@ function addImpressions(impressions, newCeleb) {
         let newImpression = document.createElement("div")
         newImpression.setAttribute("id", `imp-${imp.id}`)
         newImpression.setAttribute("class", `impression`)
+        console.log
         newImpression.innerHTML = `
-        <p> ${json.username}'s Impression: </p>
+        <p> ${json.username}'s Impression: ${json.match_score}% Match </p>
         <audio controls>
         <source src="${json.link}" type="audio/mpeg">
           Your browser does not support the <code>audio</code> element. 
@@ -230,9 +231,11 @@ function addImpressions(impressions, newCeleb) {
   function postImpression(audioImp, celeb, newCeleb) {
     let loggedIn = document.querySelector("#loggedIn")
     let user = (loggedIn.className).split("-")[1]
-    // let file = document.querySelector(`#input-${celeb.id}`).files[0]
+    let match = Math.floor(Math.random() * 50) + 50
     const formData = new FormData()
           formData.append('impression[user_id]', user),
+          formData.append('impression[user_id]', user),
+          formData.append('impression[match_score]', match),
           formData.append('impression[celebrity_id]', celeb.id),
           formData.append('impression[audio_impression]', audioImp)
       
@@ -254,7 +257,7 @@ function addImpressions(impressions, newCeleb) {
     newImpression.setAttribute("id", `imp-${json.id}`)
     newImpression.setAttribute("class", `impression`)
     newImpression.innerHTML = `
-    <p> ${json.username}'s Impression: </p>
+    <p> ${json.username}'s Impression: ${json.match_score}% Match </p>
     <audio controls>
     <source src="${json.link}" type="audio/mpeg">
       Your browser does not support the <code>audio</code> element. 
@@ -280,7 +283,7 @@ function addImpressions(impressions, newCeleb) {
   {method: 'delete'}
   ).then( function() {
     document.querySelector(`#imp-${impression.id}`).style.display = "none"
-    fetchCelebrities()
+    // fetchCelebrities()
   })
 
   }
