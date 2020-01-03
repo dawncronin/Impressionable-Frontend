@@ -1,23 +1,52 @@
+body {
+	background: #444;
+}
+.celebName {
+	text-align: center;
+}
+
+h1 {
+    font-weight: 100;
+    letter-spacing: 2.2px;
+    font-family: monospace;
+}
+h2 {
+    font-weight: 100;
+    letter-spacing: 1.5px;
+    font-family: monospace;
+}
 .sidenav {
+	font-family: monospace;
+
 	height: 100%; /* Full-height: remove this if you want "auto" height */
 	width: 300px; /* Set the width of the sidebar */
 	position: fixed; /* Fixed Sidebar (stay in place on scroll) */
 	z-index: 1; /* Stay on top */
 	top: 0; /* Stay at the top */
 	left: 0;
-	background-color: #111; /* Black */
+	background-color: #333; /* Black */
 	color: rgba(228, 236, 236, 0.75);
 	overflow-x: hidden; /* Disable horizontal scroll */
 	padding-top: 20px;
-  }
+	box-shadow: 14px 0 rgba(12,13,14,0.1), 0 1px 6px rgba(60,65,70,0.1);
+	}
+
   .main {
+	font-family: monospace;
+
+	color: rgba(228, 236, 236, 0.75);
+
+
 	margin-left: 300px; /* Same as the width of the sidebar */
 	padding: 10px 5px 5px 5px;
   }
 
   #login{
+	  padding: 10px 10px 10px 10px;
+	  margin: 10px 10px 10px 10px;
+	color: rgba(228, 236, 236, 0.75);
+
 	  display: block;
-	  color: black;
   }
 
   #afterLogin{
@@ -25,6 +54,8 @@
   }
 
   .box {
+	padding: 10px 10px 10px 10px;
+	margin: 10px 10px 10px 10px;
 	border-radius: 4px;
 	margin-bottom: 2em;
 	background: #2c2c32;
@@ -36,13 +67,31 @@
 	display: none
 }
 
+#CelebrityName {
+	text-align: center;
+	color: rgba(42, 126, 126, 0.75);
+
+}
 .celebName:hover {
 	color: rgba(42, 126, 126, 0.75);
 	background: #262627;
 
 }
 
-button{
+.record{
+	color: rgba(228, 236, 236, 0.75);
+	background: #2c2c32;
+    height:20px; 
+    width:100px; 
+    /* margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    left:50%; */
+}
+
+#logout{
+	color: rgba(228, 236, 236, 0.75);
+	background: #2c2c32;
     height:20px; 
     width:100px; 
     margin: -20px -50px; 
@@ -50,6 +99,17 @@ button{
     top:50%; 
     left:50%;
 }
+
+
+img {
+	border-radius: 6px;
+}
+
+audio { 
+	width: 300px; 
+	box-shadow: 5px 5px 20px rgba(0,0, 0, 0.4);
+	transform: scale(.75);
+  }
 
 
   

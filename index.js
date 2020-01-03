@@ -2,6 +2,61 @@ const impressionsURL = "http://localhost:3000/impressions"
 const celebritiesURL = "http://localhost:3000/celebrities"
 const usersURL = "http://localhost:3000/users"
 
+// ****************************************************
+const recordAudio = () =>
+  new Promise(async resolve => {
+// creates an empty media stream object 
+// mozilla developer.mozilla.org/en-US/docs/Web/API/MediaStream
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+// adds the stream to the new mediaRecorder property 
+    const mediaRecorder = new MediaRecorder(stream);
+    const audioChunks = [];
+// audio is compiled chunks of data, gathered with the dataavailable event, which is fired when audioRecorder starts making data 
+// we push those audio data's into an empty array
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+    const start = () => mediaRecorder.start();
+    const stop = (celeb, newCeleb) =>
+      new Promise(resolve => {
+        mediaRecorder.addEventListener("stop", () => {
+          const impressionBlob = new Blob(audioChunks);
+          const impressionAudioUrl = URL.createObjectURL(impressionBlob);
+          postImpression(impressionBlob, celeb, newCeleb)
+          const audio = new Audio(impressionAudioUrl);
+          const play = () => audio.play();
+          resolve({ impressionBlob, impressionAudioUrl, play });
+        });
+        mediaRecorder.stop();
+      });
+    resolve({ start, stop });
+});
+let recorder = null;
+let audio = null;
+const recordStop = async (event, celeb, newCeleb) => {
+  event.preventDefault()
+  if (recorder) {
+    audio = await recorder.stop(celeb, newCeleb);
+    console.log(audio)
+    recorder = null;
+    document.querySelector(`#record-${celeb.id}`).textContent = "Lemme Try!";
+    // document.querySelector(`#play-${celeb.id}`).removeAttribute("disabled");
+  } else {
+    recorder = await recordAudio();
+    recorder.start();
+    document.querySelector(`#record-${celeb.id}`).textContent = "Stop";
+  }
+};
+// const playAudio = (event, celeb) => {
+//   event.preventDefault()
+//   if (audio && typeof audio.play === "function") {
+//     audio.play();
+//   }
+// };
+// ****************************************************
+
+
+
 document.addEventListener("DOMContentLoaded", (event) => {
   fetchUsers()
 
@@ -102,7 +157,7 @@ function addCelebrity(celeb) {
       newCeleb.setAttribute("class", "box")
       newCeleb.style.display = "none"
       newCeleb.innerHTML = `
-      <h3> ${celeb.attributes.name} </h3>
+      <h2> ${celeb.attributes.name} </h2>
       <img src=${celeb.attributes.image} width=300>
       <p>${celeb.attributes.description}</p>
       <p>"${celeb.attributes.audio_text}"</p>
@@ -117,13 +172,17 @@ function addCelebrity(celeb) {
       newImpression.setAttribute("id", `newImpression-${celeb.id}`)  
       newImpression.innerHTML = `
       <p> Add your impression below: </p>
-      <input type="file" id="input-${celeb.id}" accept="audio/*" capture>
+      <button class="record" id="record-${celeb.id}">Lemme Try!</button> <br>
 
-      <h3> The Impressions: </H3>
+      <h2> The Impressions: </h2>
       `
-          
+      // <input type="file" id="input-${celeb.id}" accept="audio/*" capture>
+
+     
       newCeleb.appendChild(newImpression)
-      document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb, newCeleb))
+      document.querySelector(`#record-${celeb.id}`).addEventListener("click", (event) => recordStop(event, celeb, newCeleb))
+      // document.querySelector(`#play-${celeb.id}`).addEventListener("click", (event) => playAudio(event, celeb))
+      // document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb, newCeleb))
       addImpressions(impressions, newCeleb)
   }
 
@@ -148,22 +207,24 @@ function addImpressions(impressions, newCeleb) {
     })
   }
 
-  function postImpression(celeb, newCeleb) {
+  function postImpression(audioImp, celeb, newCeleb) {
     let loggedIn = document.querySelector("#loggedIn")
     let user = (loggedIn.className).split("-")[1]
-    let file = document.querySelector(`#input-${celeb.id}`).files[0]
+    // let file = document.querySelector(`#input-${celeb.id}`).files[0]
     const formData = new FormData()
           formData.append('impression[user_id]', user),
           formData.append('impression[celebrity_id]', celeb.id),
-          formData.append('impression[audio_impression]', file)
+          formData.append('impression[audio_impression]', audioImp)
       
         fetch(impressionsURL, {
           method: 'POST',
           body: formData })
       .then(res => res.json())
       .then(json => {
+        console.log(json)
         renderNewImpression(json, celeb, newCeleb)
-        document.querySelector(`#input-${celeb.id}`).files[0] = null})
+        // document.querySelector(`#input-${celeb.id}`).files[0] = null
+      })
   }
 
   function renderNewImpression(json, celeb, newCeleb) {
