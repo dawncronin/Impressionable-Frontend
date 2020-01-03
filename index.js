@@ -100,6 +100,7 @@ function waitForLogin(users) {
 function renderCurrentUser(currentUser) {
   let loggedIn = document.querySelector("#loggedIn")
   let logout = document.querySelector("#logout")
+  let deleteAccount = document.querySelector("#delete")
   document.querySelector("#login").style.display = "none"
   document.querySelector("#chooseCeleb").style.display = "block"
   document.querySelector("#afterLogin").style.display = "block"
@@ -107,16 +108,26 @@ function renderCurrentUser(currentUser) {
   loggedIn.innerText = `Logged in as ${currentUser.attributes.username}`
   loggedIn.setAttribute("class", `user-${currentUser.id}`)
   logout.style.display = "block"
+  deleteAccount.style.display = "block"
+  deleteAccount.addEventListener("click", event => deleteAccountEvent(currentUser, event))
   logout.addEventListener("click", event => logoutEvent(event))
+}
+
+function deleteAccountEvent(currentUser, event) {
+  fetch(`${usersURL}/${currentUser.id}`,
+  {method: 'delete'}
+  ).then( logoutEvent(event))
 }
 
 function logoutEvent(event) {
   let loggedIn = document.querySelector("#loggedIn")
-  loggedIn.innerText = `Please Login!`
+  loggedIn.innerText = ''
   document.querySelector("#login").style.display = "block"
   document.querySelector("#chooseCeleb").style.display = "none"
   document.querySelector("#celebrityNames").style.display = "none"
   document.querySelector("#afterLogin").style.display = "none"
+  document.querySelector("#delete").style.display = "none"
+  document.querySelector("#logout").style.display = "none"
   event.target.style.display = "none"
 }
 
@@ -144,7 +155,6 @@ function displayCeleb(event, celeb){
   let children = celebContainer.children
   console.log(children)
   for(let i = 0; i < children.length; i++){
-    
     children[i].style.display = "none"}
 
   celebElement.style.display = "block"
@@ -176,13 +186,10 @@ function addCelebrity(celeb) {
 
       <h2> The Impressions: </h2>
       `
-      // <input type="file" id="input-${celeb.id}" accept="audio/*" capture>
-
      
       newCeleb.appendChild(newImpression)
       document.querySelector(`#record-${celeb.id}`).addEventListener("click", (event) => recordStop(event, celeb, newCeleb))
       // document.querySelector(`#play-${celeb.id}`).addEventListener("click", (event) => playAudio(event, celeb))
-      // document.querySelector(`#input-${celeb.id}`).addEventListener("change", (event) => postImpression(event, celeb, newCeleb))
       addImpressions(impressions, newCeleb)
   }
 
@@ -191,18 +198,31 @@ function addImpressions(impressions, newCeleb) {
       fetch(`${impressionsURL}/${imp.id}/audio`)
       .then(res => res.json())
       .then(function(json) {
+        let loggedIn = document.querySelector("#loggedIn")
+        let user = (loggedIn.className).split("-")[1]
         let newImpression = document.createElement("div")
         newImpression.setAttribute("id", `imp-${imp.id}`)
+        newImpression.setAttribute("class", `impression`)
         newImpression.innerHTML = `
         <p> ${json.username}'s Impression: </p>
         <audio controls>
         <source src="${json.link}" type="audio/mpeg">
           Your browser does not support the <code>audio</code> element. 
         </audio>
+        <br>
 
         `
 
         newCeleb.appendChild(newImpression)
+        if (parseInt(user) == parseInt(json.user_id)) {
+          let deleteImp = document.createElement("button")
+          deleteImp.setAttribute("id", `deleteImp-${json.id}`)
+          deleteImp.setAttribute("class", `deleteImp`)
+
+          deleteImp.innerText = "Delete Your Impression"
+          newImpression.appendChild(deleteImp)
+          deleteImp.addEventListener("click", (event) => deleteImpressionEvent(event, json))
+        }
       })
     })
   }
@@ -228,17 +248,40 @@ function addImpressions(impressions, newCeleb) {
   }
 
   function renderNewImpression(json, celeb, newCeleb) {
-    
+    let loggedIn = document.querySelector("#loggedIn")
+    let user = (loggedIn.className).split("-")[1]
     let newImpression = document.createElement("div")
     newImpression.setAttribute("id", `imp-${json.id}`)
+    newImpression.setAttribute("class", `impression`)
     newImpression.innerHTML = `
     <p> ${json.username}'s Impression: </p>
     <audio controls>
     <source src="${json.link}" type="audio/mpeg">
       Your browser does not support the <code>audio</code> element. 
     </audio>
+    <br>
     `
+
     newCeleb.appendChild(newImpression)
+    if (parseInt(user) == parseInt(json.user_id)) {
+      let deleteImp = document.createElement("button")
+      deleteImp.setAttribute("id", `deleteImp-${json.id}`)
+      deleteImp.setAttribute("class", `deleteImp`)
+
+      deleteImp.innerText = "Delete Your Impression"
+      newImpression.appendChild(deleteImp)
+      deleteImp.addEventListener("click", (event) => deleteImpressionEvent(event, json))
+    }
+
+  }
+
+  function deleteImpressionEvent(event, impression) {
+    fetch(`${impressionsURL}/${impression.id}`,
+  {method: 'delete'}
+  ).then( function() {
+    document.querySelector(`#imp-${impression.id}`).style.display = "none"
+    fetchCelebrities()
+  })
 
   }
         
