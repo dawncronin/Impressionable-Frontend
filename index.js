@@ -39,7 +39,7 @@ const recordStop = async (event, celeb, newCeleb) => {
     audio = await recorder.stop(celeb, newCeleb);
     console.log(audio)
     recorder = null;
-    document.querySelector(`#record-${celeb.id}`).textContent = "Lemme Try!";
+    document.querySelector(`#record-${celeb.id}`).textContent = "Record";
     // document.querySelector(`#play-${celeb.id}`).removeAttribute("disabled");
   } else {
     recorder = await recordAudio();
@@ -182,7 +182,7 @@ function addCelebrity(celeb) {
       newImpression.setAttribute("id", `newImpression-${celeb.id}`)  
       newImpression.innerHTML = `
       <p> Add your impression below: </p>
-      <button class="record" id="record-${celeb.id}">Lemme Try!</button> <br>
+      <button class="record" id="record-${celeb.id}">Record</button> <br>
 
       <h2> The Impressions: </h2>
       `
