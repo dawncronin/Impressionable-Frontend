@@ -172,7 +172,7 @@ function addCelebrity(celeb) {
       <p>${celeb.attributes.description}</p>
       <p>"${celeb.attributes.audio_text}"</p>
       <audio controls>
-      <source src="https://impressionable-backend.herokuapp.com/${celeb.attributes.audio_url}" type="audio/mpeg">
+      <source src="${celeb.attributes.audio_url}" type="audio/mpeg">
         Your browser does not support the <code>audio</code> element. 
       </audio>
       `
