@@ -1,6 +1,6 @@
-const impressionsURL = "http://localhost:3000/impressions"
-const celebritiesURL = "http://localhost:3000/celebrities"
-const usersURL = "http://localhost:3000/users"
+const impressionsURL = "https://impressionable-backend.herokuapp.com/impressions"
+const celebritiesURL = "https://impressionable-backend.herokuapp.com/celebrities"
+const usersURL = "https://impressionable-backend.herokuapp.com/users"
 
 // ****************************************************
 const recordAudio = () =>
